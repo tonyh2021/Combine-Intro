@@ -10,15 +10,13 @@ import SwiftUI
 struct OperatorDiagram: View {
     let operatorModel: OperatorModel
     
-    @State private var circleHeight: CGFloat
-    
     private let circleSpacing: CGFloat
+    @State private var circleHeight: CGFloat = 80
     
     init(operatorModel: OperatorModel) {
         self.operatorModel = operatorModel
         let screenWidth = UIScreen.main.bounds.width
         self.circleSpacing = screenWidth > 400 ? 20 : 16
-        self.circleHeight = 80
     }
     
     var body: some View {
@@ -29,7 +27,7 @@ struct OperatorDiagram: View {
 extension OperatorDiagram {
     
     private var operatorView: some View {
-        VStack() {
+        VStack(spacing: 0) {
             valuesRow(operatorModel.p1)
             if let p2 = operatorModel.p2 {
                 valuesRow(p2)
@@ -37,28 +35,34 @@ extension OperatorDiagram {
             operatorRow
             valuesRow(operatorModel.output)
         }
-        .frame(maxWidth: 500)
-        .padding(.horizontal)
+        .frame(maxWidth: 500, maxHeight: 300)
     }
     
+//    https://stackoverflow.com/questions/61311007/dynamically-size-a-geometryreader-height-based-on-its-elements
     private func valuesRow(_ values: [String]) -> some View {
-        GeometryReader { geometry in
-            let count: CGFloat = CGFloat(operatorModel.output.count)
-            let circleHeight = (geometry.size.width - (count + 1) * self.circleSpacing) / count
-            ZStack() {
-                ArrowView()
-                HStack(spacing: circleSpacing) {
-                    ForEach(values, id: \.self) {
-                        circle(withValue: $0)
+        VStack {
+            GeometryReader { geometry in
+                let count: CGFloat = CGFloat(operatorModel.output.count)
+                let circleHeight = (geometry.size.width - (count + 1) * self.circleSpacing) / count
+                ZStack() {
+                    ArrowView()
+                    HStack(spacing: circleSpacing) {
+                        ForEach(values, id: \.self) {
+                            circle(withValue: $0, circleHeight: circleHeight)
+                        }
                     }
                 }
+                .background(GeometryReader {gp -> Color in
+                    DispatchQueue.main.async {
+                        // update on next cycle with calculated height of ZStack !!!
+                        self.circleHeight = gp.size.height
+                    }
+                    return Color.clear
+                })
             }
-            .onAppear {
-                self.circleHeight = circleHeight
-            }
+            .allowsHitTesting(false)
         }
         .frame(height: self.circleHeight)
-        .allowsHitTesting(false)
     }
 
     private var operatorRow: some View {
@@ -73,7 +77,8 @@ extension OperatorDiagram {
         .padding(.vertical, 20)
     }
 
-    private func circle(withValue value: String) -> some View {
+    private func circle(withValue value: String, circleHeight: CGFloat) -> some View {
+        print(111)
         let style = ValueStyle.style(for: value)
         return ZStack {
             Circle()

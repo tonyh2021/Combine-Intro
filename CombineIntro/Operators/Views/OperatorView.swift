@@ -14,6 +14,7 @@ struct OperatorView: View {
     
     var body: some View {
         ScrollView {
+            Spacer(minLength: 1)
             LazyVStack {
                 descriptionView
                 OperatorDiagram(operatorModel: vm.currentOperator)
