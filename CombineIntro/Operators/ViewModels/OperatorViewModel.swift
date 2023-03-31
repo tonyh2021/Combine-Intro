@@ -1,5 +1,5 @@
 //
-//  OperatorsViewModel.swift
+//  OperatorViewModel.swift
 //  CombineIntro
 //
 //  Created by Tony on 2023-03-31.
@@ -7,9 +7,11 @@
 
 import Foundation
 
-class OperatorsViewModel: ObservableObject {
+class OperatorViewModel: ObservableObject {
     
     @Published var operatorGroups: [OperatorGroup]
+    
+    @Published var currentOperator: OperatorModel = OperatorModel.map
     
     init() {
         operatorGroups = [

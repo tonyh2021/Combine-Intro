@@ -22,7 +22,7 @@ struct ArrowView: View {
         HStack(spacing: 0) {
             Rectangle()
                 .fill(.black)
-                .frame(width: 300, height: 3)
+                .frame(maxWidth: .infinity, maxHeight: 3)
             Triangle()
                 .fill(.black)
                 .frame(width: 10, height: 10)
@@ -44,6 +44,5 @@ struct Triangle: Shape {
 struct ArrowView_Previews: PreviewProvider {
     static var previews: some View {
         ArrowView()
-            .frame(width: 100, height: 100)
     }
 }
