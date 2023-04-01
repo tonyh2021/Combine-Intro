@@ -66,19 +66,24 @@ extension OperatorDiagram {
     }
 
     private var operatorRow: some View {
-        Text(operatorModel.operatorTitle)
-            .font(.custom("Menlo", size: 26))
-            .fontWeight(.bold)
-            .padding()
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(lineWidth: 2)
-            )
-        .padding(.vertical, 20)
+        HStack {
+            Text(operatorModel.operatorTitle)
+                .font(.custom("Menlo", size: 30))
+                .fontWeight(.bold)
+            // fit the size
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(lineWidth: 2)
+                )
+                .padding(.vertical, 20)
+        }
+        .padding(.horizontal, 20)
     }
 
     private func circle(withValue value: String, circleHeight: CGFloat) -> some View {
-        print(111)
         let style = ValueStyle.style(for: value)
         return ZStack {
             Circle()
@@ -94,6 +99,6 @@ extension OperatorDiagram {
 
 struct OperatorDiagram_Previews: PreviewProvider {
     static var previews: some View {
-        OperatorDiagram(operatorModel: OperatorModel.map)
+        OperatorDiagram(operatorModel: OperatorModel.filter)
     }
 }
