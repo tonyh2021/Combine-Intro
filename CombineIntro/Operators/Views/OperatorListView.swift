@@ -14,7 +14,7 @@ struct OperatorListView: View {
     
     var body: some View {
         NavigationView {
-            if #available(iOS 17.0, *) {
+            if #available(iOS 14.0, *) {
                 ZStack {
                     List {
                         ForEach(vm.operatorGroups) { group in
