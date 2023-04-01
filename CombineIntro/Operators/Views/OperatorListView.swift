@@ -14,25 +14,30 @@ struct OperatorListView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                List {
-                    ForEach(vm.operatorGroups) { group in
-                        sectionView(group)
+            if #available(iOS 17.0, *) {
+                ZStack {
+                    List {
+                        ForEach(vm.operatorGroups) { group in
+                            sectionView(group)
+                        }
                     }
+                    .listStyle(PlainListStyle())
                 }
-                .listStyle(PlainListStyle())
-            }
-            .navigationTitle("Operators")
-            .background(
-                NavigationLink(
-                    destination: OperatorView()
-                        .environmentObject(vm),
-                    isActive: $showOperatorView,
-                    label: {
-                        EmptyView()
-                    }
+                .navigationTitle("Operators")
+                .background(
+                    NavigationLink(
+                        destination: OperatorView()
+                            .environmentObject(vm),
+                        isActive: $showOperatorView,
+                        label: {
+                            EmptyView()
+                        }
+                    )
                 )
-            )
+            } else {
+                // Fallback on earlier versions
+                tipViewForIOS13
+            }
         }
     }
     
@@ -43,6 +48,22 @@ struct OperatorListView: View {
 }
 
 extension OperatorListView {
+    
+    private var tipViewForIOS13: some View {
+        VStack(spacing: 20) {
+            Text("OperatorDemo only supports iOS14+ 😂")
+            .font(.title)
+            Text("For for demos, please review UIKit or ")
+            Button(action: {
+                if let url = URL(string: "https://github.com/tonyh2021/SwiftfulCrypto") {
+                    UIApplication.shared.open(url)
+                }
+            }) {
+                Text("SwiftfulCrypto")
+            }
+        }
+    }
+    
     private func sectionView(_ group: OperatorGroup) -> some View {
         Section {
             ForEach(group.operators) { item in
@@ -65,6 +86,9 @@ extension OperatorListView {
 
 struct OperatorListView_Previews: PreviewProvider {
     static var previews: some View {
-        OperatorListView()
+        NavigationView {
+            OperatorListView()
+        }
+        .navigationViewStyle(.stack)
     }
 }

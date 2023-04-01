@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 
+@available(iOS 14.0, *)
 struct OperatorView: View {
     
     @EnvironmentObject private var vm: OperatorViewModel
@@ -26,6 +27,7 @@ struct OperatorView: View {
     }
 }
 
+@available(iOS 14.0, *)
 extension OperatorView {
     private var descriptionView: some View {
         VStack(alignment: .leading) {
@@ -47,6 +49,7 @@ extension OperatorView {
     }
 }
 
+@available(iOS 14.0, *)
 struct OperatorView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
