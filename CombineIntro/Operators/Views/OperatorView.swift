@@ -14,13 +14,15 @@ struct OperatorView: View {
     
     var body: some View {
         ScrollView {
-            Spacer(minLength: 1)
             LazyVStack {
                 descriptionView
                 OperatorDiagram(operatorModel: vm.currentOperator)
+                    .padding(.horizontal, 8)
             }
         }
         .navigationTitle(vm.currentOperator.operatorName)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarItems(trailing: link)
     }
 }
 
@@ -33,6 +35,15 @@ extension OperatorView {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
+    }
+    
+    @ViewBuilder
+    private var link: some View {
+        if let url = URL(string: vm.currentOperator.link) {
+            Link("Document", destination: url)
+        } else {
+            EmptyView()
+        }
     }
 }
 
