@@ -47,8 +47,8 @@ extension OperatorDiagram {
                 ZStack() {
                     ArrowView()
                     HStack(spacing: circleSpacing) {
-                        ForEach(values, id: \.self) {
-                            circle(withValue: $0, circleHeight: circleHeight)
+                        ForEach(values.indices, id: \.self) { index in
+                            circle(withValue: values[index], circleHeight: circleHeight)
                         }
                     }
                 }
