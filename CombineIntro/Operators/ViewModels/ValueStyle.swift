@@ -33,10 +33,10 @@ struct ValueStyle {
             borderColor = Color(hex: 0xFFFFFF, alpha: 0)
             fillColor = Color(hex: 0xFFFFFF, alpha: 0)
             textColor = Color(hex: 0x000000)
-        case "nil":
+        case "nil": 
             borderColor = Color(hex: 0xFFFFFF)
             fillColor = Color(hex: 0x677799)
-        case "0":
+        case "0": // transparent
             borderColor = Color(hex: 0xFFFFFF, alpha: 0)
             fillColor = Color(hex: 0xFFFFFF, alpha: 0)
             textColor = Color(hex: 0xFFFFFF, alpha: 0)
