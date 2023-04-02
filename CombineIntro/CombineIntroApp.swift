@@ -41,17 +41,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         
-        // Create the SwiftUI view that provides the window contents.
-        let rootView = NavigationView {
-            OperatorListView()
-        }
-        .navigationViewStyle(.stack)
-//        let rootView = ContentView()
-        
-        // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
-            let host = UIHostingController(rootView: rootView)
+            var host: UIViewController
+            
+            // Create the SwiftUI view that provides the window contents.
+            let rootView = NavigationView {
+                OperatorListView()
+            }
+            .navigationViewStyle(.stack)
+            // SwiftUI - Use a UIHostingController as window root view controller.
+            host = UIHostingController(rootView: rootView)
+
+            // Create ViewController for UIKit
+            let rootViewController = ListViewController()
+            // UIKit - just a normal Nav
+            host = UINavigationController(rootViewController: rootViewController)
+            
             window.rootViewController = host
             self.window = window
             window.makeKeyAndVisible()
