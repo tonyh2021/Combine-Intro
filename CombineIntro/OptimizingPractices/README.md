@@ -2,4 +2,6 @@
 
 (I have improved `SessionManager` by using `Type Aliases`, `generics` and `Result`, just for creating new code reference only. Code tagged with V1).
 
+In the same way, if Views(`ListViewController`) has been implemented, we should minimize its modification during the optimization.
+
 So it is usually best to leave the logic code unchanged and instead work on creating new functionality or improving existing features within the existing code framework.
