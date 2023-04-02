@@ -9,6 +9,8 @@ import UIKit
 
 class CoinCell: UITableViewCell {
     
+    private(set) var coinModel: CoinModel?
+    
     static func cell(withTableView tableView: UITableView) -> CoinCell {
         let cellIdentifier = "\(String(describing: Self.self))Identifier"
         
@@ -27,9 +29,10 @@ class CoinCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    var coinModel: CoinModel? {
-        didSet {
-            textLabel?.text = coinModel?.name
+    func updateModel(coin: CoinModel?, index: IndexPath) {
+        self.coinModel = coin
+        if let name = coin?.name {
+            textLabel?.text = "\(index.row + 1) - \(name)"
         }
     }
 }

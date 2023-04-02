@@ -10,6 +10,7 @@ import Combine
 
 enum NetworkError: LocalizedError {
     case badServerResponse(_ url: URL, code: Int)
+    case decodeDataNil
     case unknown
     
     var errorDescription: String? {
@@ -17,6 +18,8 @@ enum NetworkError: LocalizedError {
         switch self {
         case .badServerResponse(let url, code: let code):
             description = "[😰] Bad response from URL: \(url), Status Code:[\(code)]"
+        case .decodeDataNil:
+            description = "[🫥] Data is nil when decoding."
         case .unknown:
             description = "[⚠️] Unknown error occured."
         }
@@ -41,32 +44,13 @@ struct SessionManager {
         self.session = URLSession(configuration: configure)
     }
     
-// MARK: Using closure
-    typealias CompletionHandler<T: Codable> = (Result<T, Error>) -> Void
-    
-    func fetchDataTask<T: Codable>(_ url: String, _ type: T.Type, completionHandler: @escaping CompletionHandler<T>) -> URLSessionDataTask {
+    /// Original version
+    func fetchDataTask(_ url: String, completionHandler: @escaping @Sendable (_ data: Data?, _ error: Error?) -> Void) -> URLSessionDataTask {
         let URL = URL(string: baseUrl.appending(url))!
         return session.dataTask(with: URL) { data, response, error in
             let (data, error) = SessionManager.handleURLResponse(data, response, error)
-            if let error = error {
-                completionHandler(.failure(error))
-                return
-            }
-            if let data = data {
-                let (obj, error) = SessionManager.decode(data, type)
-                if let error = error {
-                    completionHandler(.failure(error))
-                } else if let obj = obj {
-                    completionHandler(.success(obj))
-                }
-                return
-            }
-            completionHandler(.failure(NetworkError.unknown))
+            completionHandler(data, error)
         }
-    }
-    
-    func fetch<T: Codable>(_ url: String, _ type: T.Type, completionHandler: @escaping CompletionHandler<T>) {
-        let _ = fetchDataTask(url, type, completionHandler: completionHandler).resume()
     }
     
     static func handleURLResponse(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> (Data?, Error?) {
@@ -94,12 +78,37 @@ struct SessionManager {
         return (data, nil)
     }
     
-    static func decode<T: Codable>(_ data: Data, _ type: T.Type) -> (T?, Error?) {
+    /// Optimize using typealias and Result Enum
+    typealias CompletionHandler<T: Codable> = (Result<T, Error>) -> Void
+    
+    func fetch<T: Codable>(_ url: String, _ type: T.Type, completionHandler: @escaping CompletionHandler<T>) {
+        let _ = fetchDataTask(url) { data, error in
+            let (obj, error) = SessionManager.decode(data, type)
+            if let error = error {
+                completionHandler(.failure(error))
+            } else if let obj = obj {
+                completionHandler(.success(obj))
+            }
+        }
+            .resume()
+    }
+    
+    static func decode<T: Codable>(_ data: Data?, _ type: T.Type) -> (T?, Error?) {
+        guard let data = data else {
+            return (nil, NetworkError.decodeDataNil)
+        }
         do {
             let obj = try JSONDecoder().decode(type, from: data)
             return (obj, nil)
         } catch let error {
             return (nil, error)
         }
+    }
+    
+    func fetch(_ url: String, completionHandler: @escaping @Sendable (_ data: Data?, _ error: Error?) -> Void) {
+        let _ = fetchDataTask(url) { data, error in
+            completionHandler(data, error)
+        }
+            .resume()
     }
 }

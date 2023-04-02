@@ -7,10 +7,12 @@
 
 import UIKit
 import SnapKit
+import Combine
 
 class ListViewController: UIViewController {
     
     private(set) var viewModel: ListViewModel
+    private var subscriptions = Set<AnyCancellable>()
     
     init(viewModel: BaseViewModel = ListViewModel()) {
         self.viewModel = viewModel as! ListViewModel
@@ -26,8 +28,16 @@ class ListViewController: UIViewController {
 
         setupUI()
         
+        setupBinding()
+        
         refreshControl.beginRefreshing()
         loadData()
+    }
+    
+    private func setupBinding() {
+        viewModel.dataSourceV2.sink { [weak self] (_) in
+            self?.endRefreshing()
+        }.store(in: &subscriptions)
     }
     
     private func setupUI() {
@@ -38,10 +48,15 @@ class ListViewController: UIViewController {
     }
     
     private func loadData() {
-        viewModel.fetchCoinList { [weak self] in
-            self?.tableView.reloadData()
-            self?.refreshControl.endRefreshing()
-        }
+//        viewModel.fetchCoinListV0 { [weak self] in
+//            self?.endRefreshing()
+//        }
+        viewModel.fetchCoinListV2()
+    }
+    
+    private func endRefreshing() {
+        self.tableView.reloadData()
+        self.refreshControl.endRefreshing()
     }
     
     @objc func refresh(_ sender: AnyObject) {
@@ -75,12 +90,12 @@ extension ListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.dataSource.count
+        return viewModel.dataSourceV2.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = CoinCell.cell(withTableView: tableView)
-        cell.coinModel = viewModel.dataSource[indexPath.row]
+        cell.updateModel(coin: viewModel.dataSourceV2.value[indexPath.row], index: indexPath)
         return cell
     }
     
