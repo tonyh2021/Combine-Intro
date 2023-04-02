@@ -13,14 +13,14 @@ protocol DataServiceable {
 }
 
 enum NetworkError: LocalizedError {
-    case badServerResponse(url: URL)
+    case badServerResponse(_ url: URL, code: Int)
     case unknown
     
     var errorDescription: String? {
         var description: String?
         switch self {
-        case .badServerResponse(url: let url):
-            description = "[😰] Bad response from URL: \(url)"
+        case .badServerResponse(let url, code: let code):
+            description = "[😰] Bad response from URL: \(url), Status Code:[\(code)]"
         case .unknown:
             description = "[⚠️] Unknown error occured."
         }
@@ -77,8 +77,8 @@ struct SessionManager {
             return (nil, error)
         }
         guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
-            if let url = response?.url {
-                return (nil, NetworkError.badServerResponse(url: url))
+            if let url = response?.url, let code = (response as? HTTPURLResponse)?.statusCode {
+                return (nil, NetworkError.badServerResponse(url, code: code))
             } else {
                 return (nil, NetworkError.unknown)
             }
@@ -118,7 +118,7 @@ final class CoinService: DataServiceable {
                 case .success(let modelList):
                     completion(modelList, nil)
                 case .failure(let error):
-                    print("Network Error: \(error.localizedDescription)")
+                    print("[Network Error]: \(error.localizedDescription)")
                     completion(nil, error.localizedDescription)
                 }
             }

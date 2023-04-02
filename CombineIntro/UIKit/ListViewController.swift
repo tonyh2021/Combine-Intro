@@ -26,6 +26,7 @@ class ListViewController: UIViewController {
 
         setupUI()
         
+        refreshControl.beginRefreshing()
         loadData()
     }
     
@@ -39,7 +40,12 @@ class ListViewController: UIViewController {
     private func loadData() {
         viewModel.fetchCoinList { [weak self] in
             self?.tableView.reloadData()
+            self?.refreshControl.endRefreshing()
         }
+    }
+    
+    @objc func refresh(_ sender: AnyObject) {
+        loadData()
     }
 
     private lazy var tableView: UITableView = {
@@ -49,7 +55,14 @@ class ListViewController: UIViewController {
         tableView.estimatedRowHeight = 0
         tableView.estimatedSectionHeaderHeight = 0
         tableView.estimatedSectionFooterHeight = 0
+        tableView.addSubview(refreshControl)
         return tableView
+    }()
+    
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refresh(_:)), for: .valueChanged)
+        return refreshControl
     }()
 }
 
