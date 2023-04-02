@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 class BaseViewModel {
 }
@@ -21,8 +22,10 @@ final class ListViewModel: BaseViewModel {
     
     init(dataService: DataServiceable = CoinService()) {
         self.dataService = dataService
+        super.init()
+        
     }
-    
+        
     func fetchCoinList(completion: @escaping () -> Void) {
         dataService.fetchData { [weak self] coinList, error in
             if let coinList = coinList {
