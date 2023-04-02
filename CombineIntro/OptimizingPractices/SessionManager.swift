@@ -6,11 +6,11 @@
 //
 
 import Foundation
-import Combine
 
 enum NetworkError: LocalizedError {
     case badServerResponse(_ url: URL, code: Int)
     case decodeDataNil
+    case decodeFailed(_ message: String)
     case unknown
     
     var errorDescription: String? {
@@ -20,6 +20,8 @@ enum NetworkError: LocalizedError {
             description = "[😰] Bad response from URL: \(url), Status Code:[\(code)]"
         case .decodeDataNil:
             description = "[🫥] Data is nil when decoding."
+        case .decodeFailed(let message):
+            description = "[🫥] Error when decoding: \(message)."
         case .unknown:
             description = "[⚠️] Unknown error occured."
         }
@@ -68,11 +70,8 @@ struct SessionManager {
             print("URL: \(String(describing: response.url))")
             print("StatusCode: \(response.statusCode)")
             print("Data Length: \(data?.count ?? 0)")
-//            do {
-//                let json = try JSONSerialization.jsonObject(with: output.data, options: [])
+//            if let json = try? JSONSerialization.jsonObject(with: data!, options: []) {
 //                print("Data: \(json)")
-//            } catch let error {
-//                print("Failed to print: \(error.localizedDescription)")
 //            }
         }
         return (data, nil)
@@ -81,34 +80,35 @@ struct SessionManager {
     /// Optimize using typealias and Result Enum
     typealias CompletionHandler<T: Codable> = (Result<T, Error>) -> Void
     
-    func fetch<T: Codable>(_ url: String, _ type: T.Type, completionHandler: @escaping CompletionHandler<T>) {
+    func fetch<T: Codable>(_ url: String, _ type: T.Type = T.self, completionHandler: @escaping CompletionHandler<T>) {
         let _ = fetchDataTask(url) { data, error in
-            let (obj, error) = SessionManager.decode(data, type)
-            if let error = error {
-                completionHandler(.failure(error))
-            } else if let obj = obj {
+            let result: Result<T, NetworkError> = SessionManager.decode(data)
+            switch result {
+            case .success(let obj):
                 completionHandler(.success(obj))
+            case .failure(let error):
+                completionHandler(.failure(error))
             }
         }
             .resume()
     }
     
-    static func decode<T: Codable>(_ data: Data?, _ type: T.Type) -> (T?, Error?) {
+    static func decode<T: Codable>(_ data: Data?) -> Result<T, NetworkError> {
         guard let data = data else {
-            return (nil, NetworkError.decodeDataNil)
+            return .failure(.decodeDataNil)
         }
         do {
-            let obj = try JSONDecoder().decode(type, from: data)
-            return (obj, nil)
+            let obj = try JSONDecoder().decode(T.self, from: data)
+            return .success(obj)
         } catch let error {
-            return (nil, error)
+            return .failure(.decodeFailed(error.localizedDescription))
         }
     }
     
     func fetch(_ url: String, completionHandler: @escaping @Sendable (_ data: Data?, _ error: Error?) -> Void) {
-        let _ = fetchDataTask(url) { data, error in
+        let task = fetchDataTask(url) { data, error in
             completionHandler(data, error)
         }
-            .resume()
+        task.resume()
     }
 }

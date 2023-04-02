@@ -34,13 +34,14 @@ extension CoinService: DataServiceable {
                     completion(nil, error.localizedDescription)
                 }
             } else {
-                let (data, error) = SessionManager.decode(data, [CoinModel].self)
+                let result: Result<[CoinModel], NetworkError> = SessionManager.decode(data)
                 DispatchQueue.main.async {
-                    if let error = error {
+                    switch result {
+                    case .success(let data):
+                        completion(data, nil)
+                    case .failure(let error):
                         print("[Network Error]: \(error.localizedDescription)")
                         completion(nil, error.localizedDescription)
-                    } else {
-                        completion(data, nil)
                     }
                 }
             }
@@ -70,13 +71,14 @@ extension CoinService: DataServiceable {
                         promise(.failure(error))
                     }
                 } else {
-                    let (data, error) = SessionManager.decode(data, [CoinModel].self)
+                    let result: Result<[CoinModel], NetworkError> = SessionManager.decode(data)
                     DispatchQueue.main.async {
-                        if let error = error {
+                        switch result {
+                        case .success(let obj):
+                            promise(.success(obj))
+                        case .failure(let error):
                             print("[Network Error]: \(error.localizedDescription)")
                             promise(.failure(error))
-                        } else {
-                            promise(.success(data ?? []))
                         }
                     }
                 }

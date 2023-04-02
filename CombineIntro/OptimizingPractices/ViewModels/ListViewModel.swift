@@ -51,7 +51,8 @@ final class ListViewModel: BaseViewModel {
                 guard let self = self else { return }
                 switch completion {
                 case .failure(let error):
-                   self.errorV2.send(error.localizedDescription)
+                    self.errorV2.send(error.localizedDescription)
+                    self.dataSourceV2.send([])
                 case .finished: return
                 }
             } receiveValue: { [weak self] restult in
