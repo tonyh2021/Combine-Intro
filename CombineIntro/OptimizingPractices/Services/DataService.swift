@@ -34,13 +34,21 @@ extension CoinService: DataServiceable {
                     completion(nil, error.localizedDescription)
                 }
             } else {
-                let result: Result<[CoinModel], NetworkError> = SessionManager.decode(data)
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let data):
-                        completion(data, nil)
-                    case .failure(let error):
-                        print("[Network Error]: \(error.localizedDescription)")
+                // Here we can use SessionManager.decode()
+                guard let data = data else {
+                    let error: NetworkError = .decodeDataNil
+                    print("[Network Error]: \(error.localizedDescription)")
+                    completion(nil, error.localizedDescription)
+                    return
+                }
+                do {
+                    let result = try JSONDecoder().decode([CoinModel].self, from: data)
+                    DispatchQueue.main.async {
+                        completion(result, nil)
+                    }
+                } catch let error {
+                    print("[Network Error]: \(error.localizedDescription)")
+                    DispatchQueue.main.async {
                         completion(nil, error.localizedDescription)
                     }
                 }

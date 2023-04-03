@@ -26,7 +26,6 @@ final class ListViewModel: BaseViewModel {
     init(dataService: DataServiceable = CoinService()) {
         self.dataService = dataService
         super.init()
-        
     }
         
     func fetchCoinListV0(completion: @escaping () -> Void) {

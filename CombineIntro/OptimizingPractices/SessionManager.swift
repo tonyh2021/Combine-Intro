@@ -55,6 +55,13 @@ struct SessionManager {
         }
     }
     
+    func fetch(_ url: String, completionHandler: @escaping @Sendable (_ data: Data?, _ error: Error?) -> Void) {
+        let task = fetchDataTask(url) { data, error in
+            completionHandler(data, error)
+        }
+        task.resume()
+    }
+    
     static func handleURLResponse(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> (Data?, Error?) {
         if let error = error {
             return (nil, error)
@@ -103,12 +110,5 @@ struct SessionManager {
         } catch let error {
             return .failure(.decodeFailed(error.localizedDescription))
         }
-    }
-    
-    func fetch(_ url: String, completionHandler: @escaping @Sendable (_ data: Data?, _ error: Error?) -> Void) {
-        let task = fetchDataTask(url) { data, error in
-            completionHandler(data, error)
-        }
-        task.resume()
     }
 }
