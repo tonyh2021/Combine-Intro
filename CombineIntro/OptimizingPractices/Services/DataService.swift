@@ -75,23 +75,20 @@ extension CoinService: DataServiceable {
             SessionManager.shared.fetch(coinListUrl) { data, error in
                 if let error = error {
                     print("[Network Error]: \(error.localizedDescription)")
-                    DispatchQueue.main.async {
-                        promise(.failure(error))
-                    }
+                    promise(.failure(error))
                 } else {
                     let result: Result<[CoinModel], NetworkError> = SessionManager.decode(data)
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let obj):
-                            promise(.success(obj))
-                        case .failure(let error):
-                            print("[Network Error]: \(error.localizedDescription)")
-                            promise(.failure(error))
-                        }
+                    switch result {
+                    case .success(let obj):
+                        promise(.success(obj))
+                    case .failure(let error):
+                        print("[Network Error]: \(error.localizedDescription)")
+                        promise(.failure(error))
                     }
                 }
             }
         }
+        .receive(on: DispatchQueue.main)
         .eraseToAnyPublisher()
     }
 }

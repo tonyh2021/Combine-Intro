@@ -56,6 +56,7 @@ final class ListViewModel: BaseViewModel {
                 }
             } receiveValue: { [weak self] restult in
                 guard let self = self else { return }
+                self.errorV2.send("")
                 self.dataSourceV2.send(restult)
             }
             .store(in: &cancellables)

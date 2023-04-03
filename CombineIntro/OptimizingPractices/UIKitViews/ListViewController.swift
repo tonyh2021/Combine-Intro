@@ -28,7 +28,7 @@ class ListViewController: UIViewController {
 
         setupUI()
         
-//        setupBinding()
+        setupBinding()
         
         refreshControl.beginRefreshing()
         loadData()
@@ -49,10 +49,10 @@ class ListViewController: UIViewController {
     }
     
     private func loadData() {
-        viewModel.fetchCoinListV0 { [weak self] in
-            self?.endRefreshing()
-        }
-//        viewModel.fetchCoinListV2()
+//        viewModel.fetchCoinListV0 { [weak self] in
+//            self?.endRefreshing()
+//        }
+        viewModel.fetchCoinListV2()
     }
     
     private func endRefreshing() {
@@ -91,14 +91,14 @@ extension ListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.dataSourceV0.count
-//        return viewModel.dataSourceV2.value.count
+//        return viewModel.dataSourceV0.count
+        return viewModel.dataSourceV2.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = CoinCell.cell(withTableView: tableView)
-        let dataSource = viewModel.dataSourceV0
-//        let dataSource = viewModel.dataSourceV2.value
+//        let dataSource = viewModel.dataSourceV0
+        let dataSource = viewModel.dataSourceV2.value
         cell.updateModel(coin: dataSource[indexPath.row], index: indexPath)
         return cell
     }
