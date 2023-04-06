@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 14.0, *)
 struct OperatorListView: View {
     
     @StateObject private var vm = OperatorViewModel()
@@ -14,30 +15,25 @@ struct OperatorListView: View {
     
     var body: some View {
         NavigationView {
-            if #available(iOS 14.0, *) {
-                ZStack {
-                    List {
-                        ForEach(vm.operatorGroups) { group in
-                            sectionView(group)
-                        }
+            ZStack {
+                List {
+                    ForEach(vm.operatorGroups) { group in
+                        sectionView(group)
                     }
-                    .listStyle(PlainListStyle())
                 }
-                .navigationTitle("Operators")
-                .background(
-                    NavigationLink(
-                        destination: OperatorView()
-                            .environmentObject(vm),
-                        isActive: $showOperatorView,
-                        label: {
-                            EmptyView()
-                        }
-                    )
-                )
-            } else {
-                // Fallback on earlier versions
-                tipViewForIOS13
+                .listStyle(PlainListStyle())
             }
+            .navigationTitle("Operators")
+            .background(
+                NavigationLink(
+                    destination: OperatorView()
+                        .environmentObject(vm),
+                    isActive: $showOperatorView,
+                    label: {
+                        EmptyView()
+                    }
+                )
+            )
         }
     }
     
@@ -47,22 +43,8 @@ struct OperatorListView: View {
     }
 }
 
+@available(iOS 14.0, *)
 extension OperatorListView {
-    
-    private var tipViewForIOS13: some View {
-        VStack(spacing: 20) {
-            Text("OperatorDemo only supports iOS14+ 😂")
-            .font(.title)
-            Text("For for demos, please review UIKit or ")
-            Button(action: {
-                if let url = URL(string: "https://github.com/tonyh2021/SwiftfulCrypto") {
-                    UIApplication.shared.open(url)
-                }
-            }) {
-                Text("SwiftfulCrypto")
-            }
-        }
-    }
     
     private func sectionView(_ group: OperatorGroup) -> some View {
         Section {
@@ -87,7 +69,11 @@ extension OperatorListView {
 struct OperatorListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            OperatorListView()
+            if #available(iOS 14.0, *) {
+                OperatorListView()
+            } else {
+                
+            }
         }
         .navigationViewStyle(.stack)
     }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 14.0, *)
 struct CustomizeOperatorDemo: View {
     
     @StateObject private var vm = CustomizeOperatorViewModel()
@@ -16,6 +17,7 @@ struct CustomizeOperatorDemo: View {
     }
 }
 
+@available(iOS 14.0, *)
 struct CustomizeOperatorDemo_Previews: PreviewProvider {
     static var previews: some View {
         CustomizeOperatorDemo()

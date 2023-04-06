@@ -45,23 +45,43 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             let window = UIWindow(windowScene: windowScene)
             var host: UIViewController
             
-            // Create the SwiftUI view that provides the window contents.
-            let rootView = NavigationView {
-                OperatorListView()
-            }
-            .navigationViewStyle(.stack)
-            // SwiftUI - Use a UIHostingController as window root view controller.
-            host = UIHostingController(rootView: rootView)
-
-            // Create ViewController for UIKit
-            let rootViewController = ListViewController()
-            // UIKit - just a normal Nav
-            host = UINavigationController(rootViewController: rootViewController)
+            host = hostForOperatorListView()
+//            host = hostForListViewController()
+//            host = hostForCombineDemo()
             
             window.rootViewController = host
             self.window = window
             window.makeKeyAndVisible()
         }
+    }
+    
+    private func hostForOperatorListView() -> UIViewController {
+        // Create the SwiftUI view that provides the window contents.
+        let rootView = NavigationView {
+            if #available(iOS 14.0, *) {
+                OperatorListView()
+            } else {
+                // Fallback on earlier versions
+                ViewForIOS13()
+            }
+        }
+        .navigationViewStyle(.stack)
+        // SwiftUI - Use a UIHostingController as window root view controller.
+        return UIHostingController(rootView: rootView)
+    }
+    
+    private func hostForListViewController() -> UIViewController {
+        // Create ViewController for UIKit
+        let rootViewController = ListViewController()
+        // UIKit - just a normal Nav
+        return UINavigationController(rootViewController: rootViewController)
+    }
+    
+    private func hostForCombineDemo() -> UIViewController {
+        // Create ViewController for UIKit
+        let rootViewController = ListViewController()
+        // UIKit - just a normal Nav
+        return UINavigationController(rootViewController: rootViewController)
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {
