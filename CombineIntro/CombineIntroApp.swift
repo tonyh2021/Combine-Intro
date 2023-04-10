@@ -45,9 +45,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             let window = UIWindow(windowScene: windowScene)
             var host: UIViewController
             
-            host = hostForOperatorListView()
+//            host = hostForOperatorListView()
 //            host = hostForListViewController()
-//            host = hostForCombineDemo()
+            host = hostForCombineDemo()
             
             window.rootViewController = host
             self.window = window
@@ -78,10 +78,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     private func hostForCombineDemo() -> UIViewController {
-        // Create ViewController for UIKit
-        let rootViewController = ListViewController()
-        // UIKit - just a normal Nav
-        return UINavigationController(rootViewController: rootViewController)
+        // Create the SwiftUI view that provides the window contents.
+        let rootView = NavigationView {
+            if #available(iOS 14.0, *) {
+                CombineIntroView()
+            } else {
+                // Fallback on earlier versions
+                ViewForIOS13()
+            }
+        }
+        .navigationViewStyle(.stack)
+        // SwiftUI - Use a UIHostingController as window root view controller.
+        return UIHostingController(rootView: rootView)
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {
